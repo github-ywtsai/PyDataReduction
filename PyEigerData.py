@@ -10,6 +10,7 @@ import math
 
 class EigerData:
     def __init__(self):
+        self.Buffer = None # for test
         self.Description = 'EigerData'
         self.MasterFF = None 
         self.MasterFN = None
@@ -124,7 +125,7 @@ class GeneralData(EigerData):
         ## convert logical ROI to NAN ROI.
         ## In NAN ROI, interesting part are 1 and others are NaN
         NANROI = np.ones(LogicalROIArray.shape)
-        NANROI[LogicalROIArray == 0] = math.nan
+        NANROI[LogicalROIArray == 0] = np.nan
         return NANROI
 
     def convMask2ROI(self,LogicalMaskArray):
