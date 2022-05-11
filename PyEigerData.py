@@ -106,6 +106,7 @@ class GeneralData(EigerData):
         self.ProcessedData = None
         self.ProcessedDataFrameNum = None
         self.NormBackground =None
+        self.DataProcessOption = {'norm':False,'ROI':False,'suppress':False,'DataCompensationFactor':1,'BGCompensationFactor':1}
         
     def loadData(self,ReqSNs):
         # load data to self.RawData
@@ -165,44 +166,18 @@ class GeneralData(EigerData):
         buffer = np.sum(buffer,axis = 0)/self.CountTime/self.ProcessedDataFrameNum
         self.ProcessedData = buffer
 
-    def processData():
-        tag_norm = False
-        tag_ROI = False
-        tag_suppress = False
-        DataCompensationFactor = None
-        BGCompensationFactor = None
-        nargin = len(args)
-        if nargin == 0:
-            print('Option:')
-            print('\t\'norm\'\t\t: normalize loaded data by count time and frames.')
-            print('\t\'ROI\'\t\t: apply ROI.')
-            print('\t\'suppress\'\t: suppress background using Data improt by _.setBackground')
+    def processData(self):
+        # process data according options in self.DataProcessOption
+        # self.DataProcessOption = {'norm':False,'ROI':False,'suppress':False,'DataCompensationFactor':1,'BGCompensationFactor':1}
+        tag_norm = self.DataProcessOption['norm']
+        tag_ROI = self.DataProcessOption['ROI']
+        tag_suppress = self.DataProcessOption['suppress']
+        DataCompensationFactor = self.DataProcessOption['DataCompensationFactor']
+        BGCompensationFactor = self.DataProcessOption['BGCompensationFactor']
 
-            print('Example 1:')
-            print('\t_.DataProcess(\'norm\')')
-            print('\tNormalize the data.')
-            print('Example 2:')
-            print('\t_.DataProcess(\'norm\',\'ROI\')')
-            print('\tNormalize the data and apply ROI.')
-            print('Example 3:')
-            print('\t_.DataProcess(\'supress\',0.8,0.9)')
-            print('\tSuppress background with sample trasmittance 0.8 and buffer transmittance 0.9.')
-            print('\t* This function includes normalization process after background supress.')
-            print('Example 4:')
-            print('\t_.DataProcess(\'supress\',0.8,0.9,\'ROI\')')
-            print('\tSuppress background and apply ROI.')
-        else:
-            if 'norm' in args:
-                tag_norm = True
-            if 'ROI' in args:
-                tag_ROI = True
-            if 'suppress' in args:
-                tag_suppress = True
-                tag_norm = False ## suppress include normlized
-                for argIdx in range(0,nargin):
-                    if args[argIdx] == 'suppress':
-                        DataCompensationFactor = args[argIdx+1]
-                        BGCompensationFactor = args[argIdx+2]
+
+        if tag_suppress:
+            tag_norm = False ## suppress include normlize
 
 
         ## process
