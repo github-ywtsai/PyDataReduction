@@ -165,7 +165,7 @@ class GeneralData(EigerData):
         buffer = np.sum(buffer,axis = 0)/self.CountTime/self.ProcessedDataFrameNum
         self.ProcessedData = buffer
 
-    def DataProcess(self,*args):
+    def processData():
         tag_norm = False
         tag_ROI = False
         tag_suppress = False
