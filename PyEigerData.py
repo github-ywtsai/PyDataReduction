@@ -106,13 +106,20 @@ class GeneralData(EigerData):
         self.ProcessedData = None
         self.ProcessedDataFrameNum = None
         self.NormBackground =None
-        self.DataProcessOption = {'norm':False,'ROI':False,'suppress':False,'DataCompensationFactor':1,'BGCompensationFactor':1}
+        self.DataProcessOption = {'norm':True,'ROI':True,'suppress':False,'DataCompensationFactor':1,'BGCompensationFactor':1}
         
     def loadData(self,ReqSNs):
         # load data to self.RawData
         # No return
         if not isinstance(ReqSNs,list):
             ReqSNs = [ReqSNs]
+        ReqSNs = np.array(ReqSNs)
+
+        # check request request SN vialable or not
+        if any(ReqSNs > self.ContainFrames):
+            print('Request frame SN out of range %d' %(self.ContainFrames))
+            return
+        
 
         ReqNum = len(ReqSNs)
         buffer = np.zeros([ReqNum,self.YPixelsInDetector,self.XPixelsInDetector])
