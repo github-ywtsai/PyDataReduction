@@ -141,6 +141,11 @@ class GeneralData(EigerData):
         LogicalROI = ~LogicalMaskArray
         return LogicalROI
 
+    def sum(self):
+        self.ProcessedDataFrameNum = len(self.RawDataFrameSN)
+        buffer = np.sum(self.RawData,axis = 0)
+        self.ProcessedData = buffer
+
     def normalize(self):
         ## normaliz data in self.RawData and store in ProcessedData
         ## apply nan ROI when ROI exist
@@ -175,7 +180,7 @@ class GeneralData(EigerData):
 
     def processData(self):
         # process data according options in self.DataProcessOption
-        # self.DataProcessOption = {'norm':False,'ROI':False,'suppress':False,'DataCompensationFactor':1,'BGCompensationFactor':1}
+        # self.DataProcessOption = {'norm':True,'ROI':False,'suppress':False,'DataCompensationFactor':1,'BGCompensationFactor':1}
         tag_norm = self.DataProcessOption['norm']
         tag_ROI = self.DataProcessOption['ROI']
         tag_suppress = self.DataProcessOption['suppress']
@@ -184,7 +189,7 @@ class GeneralData(EigerData):
 
 
         if tag_suppress:
-            tag_norm = False ## suppress include normlize
+            tag_norm = False ## suppress included in normlize
 
 
         ## process
