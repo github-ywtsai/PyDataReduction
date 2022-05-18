@@ -7,6 +7,7 @@ import hdf5plugin
 import os
 import numpy as np
 import math
+import csv
 
 class EigerData:
     def __init__(self):
@@ -128,6 +129,29 @@ class GeneralData(EigerData):
 
         self.RawData = buffer
         self.RawDataFrameSN = ReqSNs
+
+                
+    def convCSV2Logical(self,CSVFP):
+        # load csv data and convert it to a logical matrix
+        fid = open(CSVFP)
+        csvreader = csv.reader(fid)
+        header = next(fid)
+        rows = []
+        for row in csvreader:
+            # row[X,Y,Value]
+            rows.append(row)
+        fid.close()
+
+        rows = np.array(rows,dtype=int)
+        Xidx = rows[:,0].flatten()
+        Yidx = rows[:,1].flatten()
+        NumTarget = len(Xidx)
+
+        Buffer = np.zeros([self.YPixelsInDetector,self.XPixelsInDetector],dtype = bool)
+        for SN in range(0,NumTarget):
+            Buffer[Yidx[SN],Xidx[SN]] = True
+
+        return Buffer
 
     def convLogical2NAN(self,LogicalROIArray):
         ## convert logical ROI to NAN ROI.
