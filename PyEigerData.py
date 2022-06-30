@@ -28,6 +28,8 @@ class EigerData:
         self.BeamCenterY = None
         self.PixelMask = None
         self.ContainFrames = None # Contain frame number in this h5 package
+        self.ContainFramesInExtLink = None
+        self.LinkData = None
         
         ## note that frame SN strart from 1 but frame idx start from 0
 
@@ -61,7 +63,18 @@ class EigerData:
         self.PixelMask = self.PixelMask.astype(bool) # convert the mask to logical array
         
         DataGroupNameList = np.array(FObj['/entry/data'])
-        NDataGroup = len(DataGroupNameList)
+        ## check file exist or not
+        for DataGroupIdx in range(0,len(DataGroupNameList)):
+            FF = self.MasterFF
+            FN = self.MasterFN.replace('_master','_'+DataGroupNameList[DataGroupIdx])
+            FP = os.path.join(FF,FN)
+            if not os.path.exists(FP):
+                DataGroupNameList = np.delete(DataGroupNameList,range(DataGroupIdx,len(DataGroupNameList)))
+                break
+            
+        self.LinkData = DataGroupNameList
+        
+        NDataGroup = len(self.LinkData)
         ContainFramesInExtLink = []
         for DataGroupIdx in range(0,NDataGroup):
             Temp = FObj['entry/data'][DataGroupNameList[DataGroupIdx]].shape[0] # DataShape: (frame,x pixel, y pixel)
@@ -77,14 +90,14 @@ class EigerData:
         FObj = h5py.File(self.MasterFP,'r')
 
         ## find ReqSN in links
-        DataGroupNameList = np.array(FObj['/entry/data'])
+        DataGroupNameList = self.LinkData
         NDataGroup = len(DataGroupNameList)
-        NextDagaGroupStartSN = 1
+        NextDataGroupStartSN = 1
         for DataGroupIdx in range(0,NDataGroup):
-            ContainFramesInExtLink = FObj['entry/data'][DataGroupNameList[DataGroupIdx]].shape[0] # DataShape: (frame,x pixel, y pixel)
-            StartSN = NextDagaGroupStartSN; # Start SN in this datagroup
+            ContainFramesInExtLink = self.ContainFramesInExtLink[DataGroupIdx]
+            StartSN = NextDataGroupStartSN; # Start SN in this datagroup
             EndSN = StartSN + ContainFramesInExtLink - 1 # End SN in this datagroup
-            NextDagaGroupStartSN = EndSN + 1 # Start SN in next datagroup
+            NextDataGroupStartSN = EndSN + 1 # Start SN in next datagroup
             
             if (ReqSN >= StartSN) & (ReqSN <= EndSN):
                 FrameSNInExtLink = ReqSN - StartSN + 1
